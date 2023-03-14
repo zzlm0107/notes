@@ -284,7 +284,7 @@ ReactDOM.render(<Person { ...person }/>, document.getElementById('test'))
 
 
 
-### refs属性
+### ref属性
 
 使用jsx写出来的组件内的标签可以定义`ref`属性来标识自己，这样就可以在组件内获取到真实渲染出来的标签。
 
@@ -318,3 +318,263 @@ myRef = React.createRef()
 <input ref={this.myRef}/>
 ```
 
+
+
+## 事件处理
+
+通过onXxx属性指定事件处理函数(注意大小写)
+
+1. React使用的是**自定义(合成)事件**, 而不是使用的原生DOM事件----为了更好的兼容性
+2. React中的事件是通过**事件委托**方式处理的(委托给组件最外层的元素) ----为了的高效
+
+通过`event.target`得到发生事件的DOM元素对象----不要过度使用`ref`
+
+
+
+## 收集表单数据
+
+react中收集表单数据的组件，即带有表单标签的组件可以分为受控组件和非受控组件。
+
+### 非受控组件
+
+现用现取，即触发事件，需要数据的时候现取此时表单的value。**（表单数据没有经过state状态管控）**
+
+```jsx
+// 创建组件
+class Login extends React.Component {
+  handleSubmit = (event) => {
+    event.preventDefault() // 阻止表单提交
+    const {username, password} = this
+    alert(`您输入的用户名是 ${username.value}，您输入的密码是：${password.value}`)
+  }
+  render() {
+    return (
+      <form action="https://www.baidu.com/" onSubmit={this.handleSubmit}>
+        用户名：<input ref={c => this.username = c} type="text" name="username" />
+        密码：<input ref={c => this.password = c} type="password" name="password" />
+        <button>登录</button>  
+      </form>
+    )
+  }
+}
+// 渲染组件
+ReactDOM.render(<Login />, document.getElementById('test'))
+```
+
+### 受控组件
+
+侦听表单数据的变化，将表单数据存储到状态 state 中，需要时从 state 中拿去表单数据。**（表单数据经过state状态管控）**
+
+```jsx
+// 创建组件
+class Login extends React.Component {
+  // 初始化状态
+  state = {
+    username: '',
+    password: ''
+  }
+  // 保存用户名到状态中
+  saveUsername = (event) => {
+    this.setState({username: event.target.value})
+  }
+  // 保存密码到状态中
+  savePassword = (event) => {
+    this.setState({password: event.target.value})
+  }
+  // 表单提交的回调
+  handleSubmit = (event) => {
+    event.preventDefault()
+    const {username, password} = this.state
+    alert(`您输入的用户名是 ${username}，您输入的密码是：${password}`)
+  }
+
+  render() {
+    return (
+      <form action="https://www.baidu.com/" onSubmit={this.handleSubmit}>
+        用户名：<input onChange={this.saveUsername} type="text" name="username" />
+        密码：<input onChange={this.savePassword} type="password" name="password" />
+        <button>登录</button>  
+      </form>
+    )
+  }
+}
+// 渲染组件
+ReactDOM.render(<Login />, document.getElementById('test'))
+```
+
+
+
+**推荐使用受控组件，因为这样可以少用ref，毕竟react官网建议我们尽量减少滥用ref。**
+
+
+
+## 高阶函数和函数柯里化
+
+**高阶函数**：如果一个函数符合下面2个规范中的任何一个，那该函数就是高阶函数。
+
+1. 若A函数，接收的参数是一个函数，那么A就可以称之为高阶函数。
+2. 若A函数，调用的返回值依然是一个函数，那么A就可以称之为高阶函数。
+
+常见的高阶函数有：`Promise`、`setTimeout`、`arr.map()`等等
+
+**函数的柯里化**：通过函数调用继续返回函数的方式，实现多次接收参数最后统一处理的函数编码形式。
+
+
+
+利用高阶函数和函数柯里化重写上述案例：
+
+```jsx
+//创建组件
+class Login extends React.Component{
+  //初始化状态
+  state = {
+    username:'', //用户名
+    password:'' //密码
+  }
+
+  //保存表单数据到状态中 （高阶函数+函数柯里化）
+  saveFormData = (dataType)=>{
+    return (event)=>{
+      this.setState({[dataType]:event.target.value})
+    }
+  }
+
+  //表单提交的回调
+  handleSubmit = (event)=>{
+    event.preventDefault() //阻止表单提交
+    const {username,password} = this.state
+    alert(`你输入的用户名是：${username},你输入的密码是：${password}`)
+  }
+  render(){
+    return(
+      <form onSubmit={this.handleSubmit}>
+        {/* 事件绑定的方法加上括号就会在初始化时立即执行，此方法返回一个函数，这个函数会在每次事件发生时由react调用并传入event参数 */}
+        用户名：<input onChange={this.saveFormData('username')} type="text" name="username"/>
+        密码：<input onChange={this.saveFormData('password')} type="password" name="password"/>
+        <button>登录</button>
+      </form>
+    )
+  }
+}
+//渲染组件
+ReactDOM.render(<Login/>,document.getElementById('test'))
+```
+
+
+
+但是不使用高阶函数和柯里化也是可以实现的
+
+```jsx
+//保存表单数据到状态中
+saveFormData = (dataType,event)=>{
+  this.setState({[dataType]:event.target.value})
+}
+
+render(){
+  return(
+	<form onSubmit={this.handleSubmit}>
+      {/* 事件绑定了一个函数，没有直接调用，并且会在事件触发时有react调用，传入event参数，实现直接获取到event对象
+      */}
+	  用户名：<input onChange={ event => this.saveFormData('username',event) } type="text" name="username"/>
+	  密码：<input onChange={ event => this.saveFormData('password',event) } type="password" name="password"/>
+	  <button>登录</button>
+	</form>
+  )
+}
+```
+
+
+
+
+
+## 组件生命周期
+
+生命周期就是指组件当前所处的某一个阶段，对应生命周期调用的函数也叫生命周期钩子。
+
+### 旧版生命周期
+
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/896e2a2a89f642129503d283b41876d3~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp" style="width:600px">
+
+
+
+**初次挂载阶段**
+
+由`ReactDOM.render()`触发---初次渲染
+
+1. `constructor()` —— 类组件中的构造函数
+2. `componentWillMount()` —— 组件将要挂载 【即将废弃】
+3. `render()`  —— 挂载组件
+4. `componentDidMount()` —— 组件挂载完成 比较常用： 一般在这个钩子中做一些初始化的事，例如：开启定时器、发送网络请求、订阅消息
+
+**数据更新阶段**
+
+【第一种情况】父组件重新`render`触发
+
+1. `componentWillReceiveProps()` —— 接收属性参数（非首次）【即将废弃】
+
+然后继续调用后面的钩子函数
+
+【第二种情况】由组件内部`this.setSate()`
+
+1. `shouldComponentUpdate()` —— 组件是否应该被更新（默认返回`true`）
+
+然后继续调用后面的钩子函数
+
+【第三种情况】强制更新 `forceUpdate()`
+
+1. `componentWillUpdate()` ——组件将要更新 【即将废弃】
+2. `render()` —— 组件更新
+3. `componentDidUpdate()` —— 组件完成更新
+
+**卸载阶段**
+
+由`ReactDOM.unmountComponentAtNode()`触发
+
+1. `componentWillUnmount()` —— 组件即将卸载
+
+
+
+### 新版生命周期
+
+<img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3bceabc916b74ff9b9a2f4552fd9b530~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp" style="width:600px">
+
+
+
+**初始化阶段**
+
+由`ReactDOM.render()`触发 —— 初次渲染
+
+1. `constructor()` —— 类组件中的构造函数
+2. `static getDerivedStateFromProps(props, state)` 从props得到一个派生的状态【新增】
+3. `render()` —— 挂载组件
+4. `componentDidMount()` —— 组件挂载完成 **比较常用**
+
+**更新阶段**
+
+由组件内部`this.setSate()`或父组件重新`render`触发或强制更新`forceUpdate()`
+
+1. `getDerivedStateFromProps()` —— 从props得到一个派生的状态  【新增】
+2. `shouldComponentUpdate()` —— 组件是否应该被更新（默认返回`true`）
+3. `render()` —— 挂载组件
+4. `getSnapshotBeforeUpdate()` —— 在更新之前获取快照【新增】
+5. `componentDidUpdate(prevProps, prevState, snapshotValue)` —— 组件完成更新
+
+**卸载阶段**
+
+由`ReactDOM.unmountComponentAtNode()`触发
+
+1. `componentWillUnmount()` —— 组件即将卸载
+
+
+
+具体详情可以查看 [react生命周期](https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)
+
+
+
+其中较为重要的几个钩子是：
+
+- `render`：初始化渲染或更新渲染调用
+
+- `componentDidMount`：开启监听, 发送ajax请求
+
+- `componentWillUnmount`：做一些收尾工作, 如: 清理定时器
