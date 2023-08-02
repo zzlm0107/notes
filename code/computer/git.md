@@ -154,3 +154,27 @@ node_modules					忽略指定文件夹
 node_modules/hello.js			忽略指定路径下的文件
 css/*.js						忽略指定后缀名文件
 ```
+
+
+
+
+
+## git与换行符问题
+
+当我们克隆仓库打开项目时，有时会出现行尾序列报错问题。
+
+罪魁祸首是`git`的一个配置属性：`core.autocrlf`。由于历史原因，`windows`下和`linux`下的文本文件的换行符不一致。`Windows`在换行的时候，同时使用了回车符`CR(carriage-return character)`和换行符`LF(linefeed character`)。而`Mac`和`Linux`系统，仅仅使用了换行符`LF`。老版本的`Mac`系统使用的是回车符`CR`。
+
+| Windows | Linux/Mac | Old Mac(pre-OSX) |
+| ------- | --------- | ---------------- |
+| CRLF    | LF        | CR               |
+| '\n\r'  | '\n'      | '\r'             |
+
+我们远程提交时git会自动将项目文件行尾序列转为`LF`，但我们用`windows`电脑`git clone`代码的时候，若我的`autocrlf`(在`windows`下安装`git`，该选项默认为`true`)为`true`，那么文件每行会被自动转成以`CRLF`结尾,格式检测插件prettier可能配置为行尾序列必须为`LF`。导致格式检测插件报错。
+
+**修改配置**，重新拉取代码。
+
+```bash
+git config --global core.autocrlf false
+```
+

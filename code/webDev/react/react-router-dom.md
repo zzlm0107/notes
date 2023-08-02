@@ -9,8 +9,6 @@ tag:
   - 路由
 ---
 
-## 路由
-
 **什么是路由?**
 
 1. 一个路由就是一个映射关系(key: value)
@@ -43,7 +41,9 @@ npm i react-router-dom
 
 
 
-### 5版本的使用
+## 5版本的使用
+
+### 基础使用
 
 1. 明确好界面中的导航区、展示区
 2. 导航区的a标签改为Link标签 `<Link to="/xxxxx">Demo</Link>`
@@ -74,7 +74,7 @@ export default class App extends Component {
 }
 ```
 
-
+### 匹配与重定向
 
 通常情况下，在`<Route path='/home' component={Home} />`中，path和component是对应的关系。不过也可以多写几个这样的标签，每个都是相同path但匹配不同的component,这样所以的component都会展示。这是因为在一组连续Route标签中当其中一个标签的path匹配到当前路径时不会停止，它会继续向下匹配，这样就会导致效率问题。并且这是不合常理的，为什么不让多个组件组合成一个呢
 
@@ -90,7 +90,7 @@ export default class App extends Component {
 </Switch>
 ```
 
-
+### 路由传参与获取
 
 **路由传参之params参数：**
 
@@ -176,7 +176,7 @@ match:
 
 
 
-### 路由刷新样式丢失问题
+### 路由刷新样式丢失
 
 根本原因在history路由模式下，嵌套路由更改了页面路径，刷新导致再次**请求index.html里通过相对路径引入的样式资源请求时路径错误**，从而丢失样式。
 
@@ -200,9 +200,13 @@ Pulbic文件夹就是根目录`/`
 
 
 
-### 6版本的使用
+## 6版本的使用
 
 6版本官方明确指明**推荐函数式组件**，同时部分原来的api进行了废弃修改。
+
+
+
+### 更新部分
 
 1. 原先路由组件标签进行了调整： `<Route path='/xxxx' element={<Demo/>}/>`，可以添加 caseSensitive 属性开启不区分大小写匹配。
 2. 删除了 `Switch标签`，改成用 `Routes标签` 替换，并且**必须使用 Routes 标签包裹路由标签**。
@@ -220,116 +224,164 @@ Pulbic文件夹就是根目录`/`
 
 
 
-5. useRoutes 路由表
+### 路由表
 
-   相比于原来的使用组件的方式表现整个路由，现在更加推荐使用路由表的方式
+相比于原来的使用组件的方式表现整个路由，现在更加推荐使用路由表的方式
 
-   ```js
-   // /routes/index.js  路由表文件
-   import Home from './home'
-   import About from './about'
-   import { Navigate } from 'react-router-dom'
-   export default = [
-     {
-       path: '/home',
-       element: <Home />，
-       children: [
-       	{
-       		path: 'about',
-       		element: <About />，
-         }
-       ]
-     },
-     {
-       path: '/',
-       element: <Navigate to="/home">
-     }
-   ]
-   ```
+```tsx
+// /router/routes.tsx  路由表文件
+import {Suspense,lazy} from 'react'
+import { Navigate } from 'react-router-dom'
 
-   ```jsx
-   import { NavLink, useRoutes } from 'react-router-dom'
-   import routes from './routes'
-   
-   export default function App () {
-     {/* 注册路由表文件 */}
-     const elements = useRoutes(routes)
-     return (
-       <NavLink className={ myClass } to='/home'></NavLink>
-       
-       {/* 路由出口 */}
-       { elements }
-     )
-   }
-   ```
+// 路由懒加载,外面需要包裹一层Suspense缓冲组件
+const Home = lazy(()=> import('./home'))
+const About = lazy(()=> import('./about'))
 
-   由于路由表的存在，在嵌套路由中我们并不知道子路由具体放在哪里，所以需要一个**路由出口组件**`<Outlet />`,此外 NavLink标签 还有一个 end属性， 表示如果子级路由匹配则结束自己的高亮效果。
+// 封装懒加载loading组件
+const withLoadingComponent = (comp: JSX.Element) => (
+	<Suspense fallback={<h2>Loading...</h2>}>
+    {comp}
+  </Suspense>
+)
 
-   
+export default = [
+  {
+    path: '/home',
+    element: withLoadingComponent(<Home />),
+    children: [
+    	{
+    		path: 'about',
+    		element: withLoadingComponent(<About />),
+      }
+    ]
+  },
+  {
+    path: '/',
+    element: <Navigate to="/home" />
+  }
+]
+```
 
-6. 函数式组件之参数
+```jsx
+import { useRoutes } from 'react-router-dom'
+import routes from './routes'
 
-   **params参数**的**传递接收**依然需要在路由路径上声明，不过由于官方推荐使用函数式组件，所以现在想到拿到函数式组件里的params参数要借助一个钩子 `useParams`
+export default function App () {
+  {/* 注册路由表文件 */}
+  const Outlet = useRoutes(routes)
+  return (
+    {/* 路由出口 */}
+    { Outlet }
+  )
+}
+```
 
-   ```jsx
-   import { useParams } from 'react-router-dom'
-   
-   export default function Detail() {
-     let params = useParams()
-     console.log(params)
-   }
-   ```
-
-   **search参数**的**传递**依然需要在路由路径上声明，拿到参数需要使用 `useSearchParams`
-
-   ```jsx
-   import { useSearchParams } from 'react-router-dom'
-   
-   export default function Detail() {
-     const {search, setSearch} = useParams() // 解构出search对象和setSearch方法
-     let id = search.get('id')
-   }
-   ```
-
-   **state参数**的获取需要使用 `useLocation`
-
-   ```jsx
-   import { useLocation } from 'react-router-dom'
-   
-   export default function Detail() {
-     const {state} = useLocation() // 解构出state对象
-     let id = search.get('id')
-   }
-   ```
+由于路由表的存在，在嵌套路由中我们并不知道子路由具体放在哪里，所以需要一个**路由出口组件**`<Outlet />`,此外 NavLink标签 还有一个 end属性， 表示如果子级路由匹配则结束自己的高亮效果。
 
 
 
-7. 编程式路由导航
+以上路由表写法等价于下面的组件形式写法：
 
-   6版本的编程式路由导航不再依赖路由组件 props 里的相关对象，而是使用官方提供的 `useNavigate` 钩子
+```tsx
+// /router/index.tsx  路由组件文件
+import App from './app'
+import Home from './home'
+import About from './about'
 
-   ```jsx
-   import { useNavigate } from 'react-router-dom'
-   
-   export default function Detail() {
-     const navigate = useNavigate() // 获取到navigate方法
-     function goHome () {
-       navigate('/home',{ // 传递参数，传递数值就是前进后退相关
-         replace: false,
-         state: {id:123}
-       })
-     }
-   }
-   ```
+import {BrowerRouter,Routes,Route,Navigate} from 'react-router-dom'
 
-8. 其他相关hooks
+const baseRouter = () => (
+	<BrowerRouter>
+    <Routes>
+      <Route path='/' element={<App />}>
+        <Route path='/' element={<Navigate to='/home' />}></Route>
+        <Route path='/home' element={<Home />}></Route>
+        <Route path='/about' element={<About />}></Route>
+      </Route>
+    </Routes>
+  </BrowerRouter>
+)
 
-   `useInRouterContext()` 判断当前组件是否被路由所管理
+export default baseRouter
+```
 
-   `useNavigateType()` 返回当前路径的导航跳转来源类型 `PCP` | 刷新页面 `PUSH`| `REPLACE`
+```tsx
+// app.tsx
+import Router from './router/index.tsx'
 
-   `useOutlet()` 返回当前路由中的路由出口（即嵌套路由）
-   
-   `useResolvePath()` 给定一个URL值，解析其中的：path、search、hash值。
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <Router />
+  </React.StrictMode>,
+)
+```
 
+
+
+### 参数获取
+
+**params参数**的**传递接收**依然需要在路由路径上声明，不过由于官方推荐使用函数式组件，所以现在想到拿到函数式组件里的params参数要借助一个钩子 `useParams`
+
+```jsx
+import { useParams } from 'react-router-dom'
+
+export default function Detail() {
+  let params = useParams()
+  console.log(params)
+}
+```
+
+**search参数**的**传递**依然需要在路由路径上声明，拿到参数需要使用 `useSearchParams`
+
+```jsx
+import { useSearchParams } from 'react-router-dom'
+
+export default function Detail() {
+  const [search, setSearch] = useSearchParams() // 解构出search对象和setSearch方法
+  let id = search.get('id')
+}
+```
+
+**state参数**的获取需要使用 `useLocation`
+
+```jsx
+import { useLocation } from 'react-router-dom'
+
+export default function Detail() {
+  const {state} = useLocation() // 解构出state对象
+  let id = search.get('id')
+}
+```
+
+
+
+### 编程式路由导航
+
+6版本的编程式路由导航不再依赖路由组件 props 里的相关对象，而是使用官方提供的 `useNavigate` 钩子
+
+```jsx
+import { useNavigate } from 'react-router-dom'
+
+export default function Detail() {
+  const navigate = useNavigate() // 获取到navigate方法
+  function goHome () {
+    navigate('/home',{ // 传递参数，传递数值就是前进后退相关
+      replace: false,
+      state: {id:123}
+    })
+  }
+}
+```
+
+
+
+### 其他相关hooks
+
+`useInRouterContext()` 判断当前组件是否被路由所管理
+
+`useNavigateType()` 返回当前路径的导航跳转来源类型 `PCP` | 刷新页面 `PUSH`| `REPLACE`
+
+`useOutlet()` 返回当前路由中的路由出口（即嵌套路由）
+
+`useResolvePath()` 给定一个URL值，解析其中的：path、search、hash值。
 
