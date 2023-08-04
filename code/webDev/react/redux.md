@@ -9,7 +9,7 @@ tag:
   - 状态管理
 ---
 
-## redux状态管理仓库
+
 
 1. redux是一个专门用于做`状态管理`的JS库(不是react插件库)。可以用在react, angular, vue等项目中, 但基本与react配合使用。
 2. 作用: 集中式管理react应用中多个组件`共享`的状态。
@@ -33,10 +33,21 @@ npm i redux
 **action**
 
 1. 动作的**对象**
+
 2. 包含 2 个属性
    - `type`：标识属性, 值为字符串, 唯一, 必要属性
    - `data`：数据属性, 值类型任意, 可选属性
+
 3. action文件中一般包含多个暴露出去的函数，每个函数接收对应的data，返回包含 type 和 data 的对象
+
+   ```js
+   export const addNum = (num) => ({
+     type: 'ADD_NUM',
+     num
+   })
+   ```
+
+   
 
 
 
@@ -46,14 +57,16 @@ npm i redux
 2. 加工时，根据旧的`state`和`action`， 产生新的`state`.本质就是一个**函数**
 
 ```js
-let initState = 0
-// 初始化会被调用一次，由store自动触发，此时preState是undefined
-function Reducer(preState=initState, action){
+
+// 初始化会被调用一次，由store自动触发，此时state是undefined
+function Reducer(state={value: 0}, action){
   const { type, data } = action
-  if(type === 'INCREMENT'){
-    return preState + 1
-  }else{
-    return preState
+  switch (type) {
+    case 'ADD_NUM':
+      // 必须要返回一个新的state对象，redux会将其替换掉旧的state
+      return { value: state.value + data }
+    default:
+      return state
   }
 }
 ```
@@ -145,6 +158,7 @@ npm install react-redux @reduxjs/toolkit
 使用
 
 ```jsx
+// store/modules/student.js
 import { createSlice } from '@reduxjs/toolkit'
 
 // 创建仓库切片，传入配置项
@@ -156,27 +170,29 @@ const studentSlice = createSlice({
   },
   reducers: { // 对state操作的各种方法
     setName(state, action){
+      // 通过相关库，相比redux现在可以直接修改state，内部会进行对比创建新的state覆盖旧的，依然维持state不可变状态
       // 两个参数，state：切片仓库代理对象，可以直接修改值，不用每次复制state替换
+      // action.payload：触发dispatch时传递的参数
       state.name = action.payload
     }
   }
 })
 
-export default studentSlice;
+export default studentSlice.reducers;
 
-// 切片对象会自动生成action，存储在actions中
-// 调用同名方法会自动生成对应派发的action
+// 切片对象会自动生成action，存储在actions中，向外暴露以供在合适时触发
 export const {setName} = studentSlice.actions
 ```
 
 ```js
+// store/index.js
 // 汇总仓库切片，构建出完整的仓库
 import { configureStore } from '@reduxjs/toolkit'
-import studentSlice from './studentSlice'
+import studentSliceReducer from './studentSlice'
 
 export default const store = configureStore({
   reducer: {
-    student: studentSlice.reducer
+    student: studentSliceReducer
   }
 })
 ```
@@ -184,6 +200,7 @@ export default const store = configureStore({
 **最后还需要向全局挂载上store对象**
 
 ```jsx
+// main.js
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
@@ -204,12 +221,12 @@ ReactDOM.render(
 
 ```jsx
 import { useSelector, useDispatch } from 'react-redux'
-import { setName } from './studentSlice'
+import { setName } from 'store/modules/student'
 
 export default App = () => {
   // 获取整体state中其中的仓库切片
   const stu = useSelector(state => state.student)
-  // 获取整体的派发器
+  // 获取整体的派发器,触发action
   const dispatch = useDispatch()
   dispatch(setName('lucy'))
   return (
@@ -225,6 +242,8 @@ export default App = () => {
 在我们使用RTK的时候，如果我们想要与服务器进行数据交互，我们就需要发送异步请求，请求数据返回时需要存储到仓库中并且要在页面更新。在原生redux中实现这一逻辑较为麻烦。并且**“数据获取和缓存” 实际上是一组不同于 “状态管理” 的关注点**。因此最好有一个工具专门完成这个任务。
 
 RTKQ是一个强大的数据获取和缓存工具,旨在简化在 Web 应用程序中加载数据的常见情况，**无需自己手动编写数据获取和缓存逻辑**。
+
+*但实际上目前还是用于axios较多，因为其可以方便的配置请求头，借助拦截器完成一些数据处理等操作，RTKQ在这里可以简单理解一下。*
 
 获取：RTKQ已经集成在了RTK库中，需要时直接引入即可
 
@@ -285,5 +304,104 @@ export default const App = () => {
     </div>
   )
 }
+```
+
+
+
+### RTK + Axios
+
+在开发中常见的一种操作是在仓库中发送请求获取数据然后存储起来，虽然redux toolkit提供了RTKQ发送请求，但常见的依然是使用axios。
+
+由于请求的异步性，仓库切片中的reducers的异步操作会修改state，但此时内部state的代理对象已经被撤销，无法进行修改赋给原仓库，导致报错问题，所以我们需要使用 `createAsyncThunk` 钩子来进行异步操作。
+
+[官网相关描述](https://cn.redux.js.org/tutorials/essentials/part-5-async-logic#%E4%BD%BF%E7%94%A8-createasyncthunk-%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE)
+
+```ts
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+
+import type { loginForm, userInfoType } from '@/api/user/type'
+import { reqLogin } from '@/api/user/index'
+
+// 定义仓库切片初始值与类型
+const initialState: {
+  token: string | null
+  menuRoutes: Array<object>
+  userInfo: userInfoType | null
+} = {
+  token: localStorage.getItem('token'),
+  menuRoutes: [],
+  userInfo: null
+}
+
+/**
+ * 用户登录方法
+ */
+// 创建异步 thunk,相当于是一个异步的action
+export const userLogin = createAsyncThunk('userLogin', async (loginForm: loginForm) => {
+  const res = await reqLogin(loginForm)
+  if (res.data.code === 200) {
+    return res.data.data
+  } else {
+    throw new Error(res.data.msg)
+  }
+})
+
+const userSlice = createSlice({
+  name: 'user',
+  initialState,
+  reducers: {},
+  // 根据异步action的状态进行不同的操作
+  extraReducers: builder => {
+    builder.addCase(userLogin.fulfilled, (state, action) => {
+      state.token = action.payload
+      localStorage.setItem('token', state.token)
+    })
+  }
+})
+
+export default userSlice.reducer
+```
+
+接下来在相关组件触发那个异步的action即可
+
+```tsx
+import { useState } from 'react'
+import style from './style.module.scss'
+
+import type { loginForm } from '@/api/user/type'
+import { useDispatch } from 'react-redux'
+import { ThunkDispatch, AnyAction } from '@reduxjs/toolkit'
+import { userLogin } from '@/store/modules/user'
+
+import { useNavigate } from 'react-router-dom'
+
+export default function AppLogin() {
+  // 定义接收异步action的类型
+  const dispatch: ThunkDispatch<string, loginForm, AnyAction> = useDispatch()
+  const navigate = useNavigate()
+
+  const [loading, setLoading] = useState<boolean>(false)
+
+  /**
+   * 登录按钮点击回调
+   */
+  const onFinish = (values: loginForm) => {
+    setLoading(true)
+    try {
+      // 触发异步action
+      dispatch(userLogin(values))
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className={style['app-login']}></div>
+  )
+}
+
 ```
 

@@ -29,6 +29,32 @@ State Hook让函数组件也可以有state状态，并进行状态数据的读�
 setXxx(newValue)：参数为非函数值，直接指定新的状态值，内部用其覆盖原来的状态值   
 setXxx(value=>newValue):参数为函数，接收上一次的状态值，返回新的状态值，内部用其覆盖原来的状态值
 
+```tsx
+import { useState } from 'react'
+
+export default function Home() {
+  const [ state, setState ] = useState({
+    name: 'andy',
+    age: 18
+  })
+  function addAge() {
+    setState({
+      ...state,
+      age:state.age + 1
+    })
+  }
+  return (
+    <div>
+      <div>姓名： {state.name}</div>
+      <div>年龄： {state.age}</div>
+      <button onClick={addAge}>年龄加一</button>
+    </div>
+  )
+}
+```
+
+
+
 
 
 ### useEffect
@@ -52,6 +78,36 @@ useEffect(()=> {
 
 可以把useEffect Hook看做如下三个函数的组合
 componentDidMount()   componentDidUpdate()   componentWillUnmount()
+
+```tsx
+import { useState, useEffect } from 'react'
+
+export default function Home() {
+  const [ state, setState ] = useState({
+    name: 'andy',
+    age: 18
+  })
+  function addAge() {
+    setState({
+      ...state,
+      age:state.age + 1
+    })
+  }
+  useEffect(() => {
+    console.log('age变成了' + state.age)
+  },[state.age])
+
+  return (
+    <div>
+      <div>姓名： {state.name}</div>
+      <div>年龄： {state.age}</div>
+      <button onClick={addAge}>年龄加一</button>
+    </div>
+  )
+}
+```
+
+
 
 
 
@@ -100,7 +156,7 @@ Ref Hook可以在函数组件中存储/查找组件内的标签 或 任意其它
 
 ### useReducer
 
-当我们使用`useState`创建了一个响应式变量后，我们可能会在不同环境下使用setxxxx来写下不同的逻辑去修改它，但是这样会导致创建的变量和对应的修改方法变得四处拆分，每次维护都变得很困难，所以我们希望对于有复杂处理逻辑的变量可以让其修改方法集中管理，`useReducer`孕育而生。
+当我们使用`useState`创建了一个响应式变量后，我们可能会在不同环境下使用setxxxx来写下不同的逻辑去修改它，但是这样会导致创建的变量和对应的修改方法变得四处拆分，每次维护都变得很困难，所以我们希望**对于有复杂处理逻辑的变量可以让其修改方法集中管理**，`useReducer`孕育而生。
 
 语法： `const [state, dispatch] = useReducer(reducer, initialArg, init?)`
 
@@ -149,6 +205,8 @@ export default App;
 语法： `const cachedFn = useCallback(fn, dependencies)`
 
 第一个参数是保存引用的函数；第二个参数是一个数组，表示重新创建引用的依赖项。
+
+
 
 
 

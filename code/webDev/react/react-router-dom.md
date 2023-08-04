@@ -231,7 +231,7 @@ Pulbic文件夹就是根目录`/`
 ```tsx
 // /router/routes.tsx  路由表文件
 import {Suspense,lazy} from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useRoutes } from 'react-router-dom'
 
 // 路由懒加载,外面需要包裹一层Suspense缓冲组件
 const Home = lazy(()=> import('./home'))
@@ -244,7 +244,7 @@ const withLoadingComponent = (comp: JSX.Element) => (
   </Suspense>
 )
 
-export default = [
+const routes = [
   {
     path: '/home',
     element: withLoadingComponent(<Home />),
@@ -260,20 +260,28 @@ export default = [
     element: <Navigate to="/home" />
   }
 ]
+
+const Router = () => {
+  const router = useRoutes(routes)
+  return router
+}
+
+export default Router
 ```
 
 ```jsx
-import { useRoutes } from 'react-router-dom'
-import routes from './routes'
+import { BrowserRouter } from 'react-router-dom'
+import Router from '@/router/routes'
 
-export default function App () {
-  {/* 注册路由表文件 */}
-  const Outlet = useRoutes(routes)
+function App() {
   return (
-    {/* 路由出口 */}
-    { Outlet }
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
   )
 }
+
+export default App
 ```
 
 由于路由表的存在，在嵌套路由中我们并不知道子路由具体放在哪里，所以需要一个**路由出口组件**`<Outlet />`,此外 NavLink标签 还有一个 end属性， 表示如果子级路由匹配则结束自己的高亮效果。
@@ -293,11 +301,9 @@ import {BrowerRouter,Routes,Route,Navigate} from 'react-router-dom'
 const baseRouter = () => (
 	<BrowerRouter>
     <Routes>
-      <Route path='/' element={<App />}>
-        <Route path='/' element={<Navigate to='/home' />}></Route>
-        <Route path='/home' element={<Home />}></Route>
-        <Route path='/about' element={<About />}></Route>
-      </Route>
+       <Route path='/' element={<Navigate to='/home' />}></Route>
+       <Route path='/home' element={<Home />}></Route>
+       <Route path='/about' element={<About />}></Route>
     </Routes>
   </BrowerRouter>
 )
@@ -309,11 +315,13 @@ export default baseRouter
 // app.tsx
 import Router from './router/index.tsx'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Router />
-  </React.StrictMode>,
-)
+function App() {
+  return (
+    <baseRouter />
+  )
+}
+
+export default App
 ```
 
 
@@ -349,7 +357,7 @@ import { useLocation } from 'react-router-dom'
 
 export default function Detail() {
   const {state} = useLocation() // 解构出state对象
-  let id = search.get('id')
+  let id = state.get('id')
 }
 ```
 

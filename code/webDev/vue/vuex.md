@@ -17,14 +17,7 @@ tag:
 ## 基本使用
 
 ```js
-  /* store/index.js */
-	//引入Vue核心库
-   import Vue from 'vue'
-   //引入Vuex
-   import Vuex from 'vuex'
-   //引用Vuex
-   Vue.use(Vuex)
-   
+	/* store/index.js */
    const actions = {
        //响应组件中加的动作
    	jia(context,value){
@@ -63,7 +56,12 @@ tag:
 
 ```js
   // main.js
-	......
+	//引入Vue核心库
+   import Vue from 'vue'
+   //引入Vuex
+   import Vuex from 'vuex'
+   //引用Vuex
+   Vue.use(Vuex)
    //引入store
    import store from './store'
    ......
@@ -88,7 +86,7 @@ tag:
 
 ```js
 // 使用时都需要从vuex中引入
-import { mapState.... } from 'vuex'
+import { mapState,.... } from 'vuex'
 ```
 
 
@@ -98,7 +96,7 @@ import { mapState.... } from 'vuex'
 ```js
  computed: {
        //借助mapState生成计算属性：sum、school、subject（对象写法）
-        ...mapState({sum:'sum',school:'school',subject:'subject'}),
+        ...mapState({mysum:'sum',myschool:'school',mysubject:'subject'}),
             
        //借助mapState生成计算属性：sum、school、subject（数组写法）
        ...mapState(['sum','school','subject']),
