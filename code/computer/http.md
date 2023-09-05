@@ -23,8 +23,6 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 
 ## 经典五层模型
 
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/%E4%BA%94%E5%B1%82%E6%A8%A1%E5%9E%8B.png)
-
 1. 应用层 
    - 为应用软件提供了很多服务，构建于协议之上。
 2. 传输层
@@ -90,7 +88,7 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 
 ## HTTP三次握手
 
-![三次握手](https://github.com/Tie-Dan/http-demo/raw/main/img/%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B.png)
+![三次握手](../../assets/images/basic/http/三次握手.png)
 
   第一次握手: 发送*SYN*报文，传达信息：“你好，我想建立连接”
 
@@ -104,7 +102,7 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 
 ## HTTP四次挥手
 
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B.png)
+![](../../assets/images/basic/http/四次挥手.png)
 
 第一次挥手: 客户端 和 服务器 打电话，通话即将结束后
 
@@ -122,28 +120,38 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 
 - 请求报文
 
+![](../../assets/images/basic/http/请求报文.png)
+
+
+
 - 响应报文
 
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/http1.png)
+![](../../assets/images/basic/http/响应报文.png)
 
 ### HTTP请求方法
 
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/%E8%AF%B7%E6%B1%82%E6%96%B9%E6%B3%95.png)
-
-1. 用来定义对于资源的操作
-
-2. 常用有GET、POST等
-
-3. 从定义上讲有各自的语义
+| 序号 | 方法    | 描述                                                         |
+| :--- | :------ | :----------------------------------------------------------- |
+| 1    | GET     | 请求指定的页面信息，并返回实体主体。                         |
+| 2    | HEAD    | 类似于 GET 请求，只不过返回的响应中没有具体的内容，用于获取报头 |
+| 3    | POST    | 向指定资源提交数据进行处理请求（例如提交表单或者上传文件）。数据被包含在请求体中。POST 请求可能会导致新的资源的建立和/或已有资源的修改。 |
+| 4    | PUT     | 从客户端向服务器传送的数据取代指定的文档的内容。             |
+| 5    | DELETE  | 请求服务器删除指定的页面。                                   |
+| 6    | CONNECT | HTTP/1.1 协议中预留给能够将连接改为管道方式的代理服务器。    |
+| 7    | OPTIONS | 允许客户端查看服务器的性能。                                 |
+| 8    | TRACE   | 回显服务器收到的请求，主要用于测试或诊断。                   |
+| 9    | PATCH   | 是对 PUT 方法的补充，用来对已知资源进行局部更新 。           |
 
 
 ### HTTP状态码
 
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/httpCode.png)
-
-1. 定义服务器对请求的处理结果
-2. 各个区间的code有各自的语义
-3. 好的http服务可以通过status code判断结果
+| 分类 | 分类描述                                       |
+| :--- | :--------------------------------------------- |
+| 1**  | 信息，服务器收到请求，需要请求者继续执行操作   |
+| 2**  | 成功，操作被成功接收并处理                     |
+| 3**  | 重定向，需要进一步的操作以完成请求             |
+| 4**  | 客户端错误，请求包含语法错误或无法完成请求     |
+| 5**  | 服务器错误，服务器在处理请求的过程中发生了错误 |
 
 **注意:**
 
@@ -156,8 +164,6 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 1. 什么是跨域
 
    - 浏览器的**同源策略**限制了跨域请求资源
-
-2. jsonp跨域
 
 3. 跨域的限制(请求)
 
@@ -174,10 +180,21 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 
    - 请求头限制,跨域对于自定义的请求头是不允许的，预请求验证通过才能发送
 
-     ```JS
-     'Access-Control-Allow-Headers':'X-Test-Cors', // 设置通过自定义的请求头
-     'Access-Control-Max-Age':'1000' // Methods和Headers的结果可以被缓存多久
-     ```
+
+ 4. 解决跨域
+
+    - 早期 jsonp跨域（利用script标签直接解析原理，仅适用get）
+
+    - 客户端开启 代理服务器
+
+    - 服务端配置 cors，添加允许跨域源，自定义请求头等
+
+      ```js
+      Access-Control-Allow-Origin: *
+      Access-Control-Allow-Methods: POST, GET, OPTIONS
+      Access-Control-Allow-Headers: X-PINGOTHER, Content-Type
+      Access-Control-Max-Age: 86400
+      ```
 
 ## Cache-Control
 
@@ -190,48 +207,38 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 共享缓存位于客户端和服务器之间，可以存储能在用户之间共享的响应。
 
 - 可缓存性 
-  - public   任何对象都可以
-  - private  只能被单个用户缓存，不能作为共享缓存
-  - no-cache 去服务端验证才能使用，即协商缓存
-  - no-store  彻底不能
-  - no-transform 代理服务器不能改动返回内容
-
+  - public   所有内容都将被缓存（客户端和代理服务器都可缓存）
+  - private  所有内容只有客户端可以缓存，Cache-Control的默认取值
+  - no-cache 客户端缓存内容，但是是否使用缓存则需要经过协商缓存来验证决定
+  - no-store  所有内容都不会被缓存
 - 到期时间(seconds)
   - max-age = < seconds >  缓存的最大时间
   - s-maxage = < seconds > 只有在代理服务器才会生效
   - max-stale = < seconds > 表明客户端愿意接收一个已经过期的资源，只能在发起端设置 就算max-age时间过期 max-stale时间没过期也会走缓存
-
-- 重新验证(了解)
-
-  - must-revalidate 资源过期，在成功向原始服务器验证之前，缓存不能用该资源响应后续请求。
-  - proxy-revalidate 同样用于资源过期缓存验证，但仅适用于共享缓存
-
 - 验证头     (不走本地缓存 发送请求带上验证头 验证决定走不走缓存 它基于no-cache**协商缓存**的情况）
   - last-Modified
 
-    - 配合If-Modified-Since使用
-    - 对比上次修改时间以验证资源是否需要更新
+    - 配合If-Modified-Since使用，服务端先返回last-Modified标识该资源最新更新时间，客户端再次请求相同资源时用If-Modified-Since回传资源最新更新时间，服务端发现该字段后即可对比
+    - 对比资源上次最新修改时间与服务器当前最新的资源修改时间是否一致以验证资源是否需要更新（200 or 304）
 
-  - Etag
+  - Etag （*优先级更高*）
 
     - 数据签名，形成hash值传给客户端，客户端在下次请求中带上，服务端再判断有无变化。
 
-    - 配合if-None-Match使用
+    - 配合if-None-Match使用，服务端先返回Etag标识该资源最新hash值，客户端再次请求相同资源时用if-None-Match回传资源hash值，服务端发现该字段后即可对比
 
-    - 对比资源的签名判断是否使用缓存
+    - 服务端每次资源的变化都会生成新的对应hash值
 
 
 ## Cookie
 
-​		![](https://github.com/Tie-Dan/http-demo/raw/main/img/setCookie.png)
-
-### 用法：
+用法：
 
 - 通过Set-Cookie设置
 - 下次请求会自动带上
 - 键值对，可以设置多个
 
-### 属性：
+属性：
 
 - max-age 和 expires设置过期时间
 - Secure只在https的时候发送
@@ -243,7 +250,7 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
   - Connection: keep-alive/close(开启/关闭)
   - HTTP2只需要建立一个TCP长连接 (同域下)
 
-## 数据协商：
+## 数据协商
 
 - 请求
 
@@ -268,21 +275,19 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
   - 加密-公钥
   - 解密-私钥
 
-![https](https://github.com/Tie-Dan/http-demo/raw/main/img/https.png)
+![](../../assets/images/basic/http/HTTPS原理.png)
 
 1. 客户端请求服务器获取`证书公钥`
-2. 客户端(SSL/TLS)解析证书（无效会弹出警告）
-3. 生成随机值
-4. 用`公钥加密`随机值生成**密钥**
+2. 客户端(SSL/TLS)解析证书（无效会弹出警告），拿到公钥
+3. 客户端生成随机值
+4. 客户端用`公钥加密`随机值生成**密钥**
 5. 客户端将`秘钥`发送给服务器
-6. 服务端用`私钥`解密`秘钥`得到随机值
+6. 服务端用`证书私钥`解密**秘钥**得到随机值
 7. `将信息和随机值混合在一起`进行对称加密
 8. 将加密的内容发送给客户端
-9. 客户端用`秘钥`解密信息
+9. 客户端用**秘钥**解密信息
 
 ## HTTP2
-
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/http2.png)
 
 - 二进制协议
 
@@ -313,14 +318,6 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
     > 不再发送请求获取css、js文件
 
   - 浏览器目前是必须开启https 才能使用http2
-
-HTTP 和 HTTP2 对比演示的demohttps://http2.akamai.com/demo
-
-## HTTP3（了解）
-
-![](https://github.com/Tie-Dan/http-demo/raw/main/img/%E4%BA%86%E8%A7%A3http3.png)
-
-
 
 
 

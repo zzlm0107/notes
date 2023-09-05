@@ -208,7 +208,7 @@ Flex 是 Flexible Box 的缩写，意为"弹性布局"，用来为盒状模型�
      display: flex;
      flex-wrap: wrap-reverse;
    }
-
+   
    .wrapper > div {
      width: 80px;
      height: 80px;
@@ -787,7 +787,7 @@ Flex 是 Flexible Box 的缩写，意为"弹性布局"，用来为盒状模型�
 
 ### flex
 
-`flex` 属性是 `flex-grow`, `flex-shrink` 和 `flex-basis` 的简写，默认值为 `0 1 auto`。后两个属性可选。
+`flex` 属性是 `flex-grow`, `flex-shrink` 和 `flex-basis` 的简写，项目flex默认值为 `0 1 auto`。后两个属性可选。
 
 ```css
 .item {
@@ -795,9 +795,32 @@ Flex 是 Flexible Box 的缩写，意为"弹性布局"，用来为盒状模型�
 }
 ```
 
-该属性有两个快捷值: `auto` (`1 1 auto`) 和 `non`e (`0 0 auto`)。
+该属性有两个快捷值: `auto` (`1 1 auto`) 和 `none` (`0 0 auto`)。
 
-建议优先使用这个属性，而不是单独写三个分离的属性，因为浏览器会推算相关值。
+如果出现flex被赋予单值或双值的情况，则浏览器会推断对应的属性值：
+
+```css
+/* 单值，无单位数字：flex-grow   flex-basis 此时等于 0。 */
+/* 所以 flex：1 等效于设置 flex：1 1 0 */
+flex: 2;
+
+/* 单值，宽度/高度：flex-basis */
+flex: 10em;
+flex: 30px;
+flex: min-content;
+
+/* 双值情况下，第一个值必定是 flex-grow */
+/* 双值：flex-grow | flex-basis */
+flex: 1 30px;
+
+/* 双值：flex-grow | flex-shrink */
+flex: 2 2;
+
+/* 三值：flex-grow | flex-shrink | flex-basis */
+flex: 2 2 10%;
+```
+
+
 
 ### align-self
 
