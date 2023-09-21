@@ -169,15 +169,11 @@ HTTP协议（HyperText Transfer Protocol，超文本传输协议）是因特网�
 
    - 默认允许跨域的方法只有get、post、head，其它的方法不允许
 
-     ```js
-     'Access-Control-Allow-Methods': 'POST,PUT,DELETE', // 设置通过请求的方法
-     ```
-
    - 默认允许Content-type是以下3个，其它类型只有通过预检请求验证通过后才能发送，即下面3个类型的（简单请求）不会触发预检请求。
      - text/plain
      - multipart/form-data
      - application/x-www-form-urlencoded
-
+   
    - 请求头限制,跨域对于自定义的请求头是不允许的，预请求验证通过才能发送
 
 

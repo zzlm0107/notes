@@ -35,7 +35,7 @@ this指上下文对象，根据函数的调用方式不同会执向不同的对�
 
 - `Function.prototype.call(thisArg, arg1, arg2, ...)`  立即执行，第一个参数为修改的this指向，后面的都是函数的参数。
 - `Function.prototype.apply(thisArg, arr)`  立即执行，第一个参数为修改的this指向，后面是一个数组，里面存放着函数的参数，调用时会将数组元素提取出来传入。
-- `Function.prototype.bind(thisArg，arg1, arg2, ...)` 返回一个新数组，即修改this指向后的数组。
+- `Function.prototype.bind(thisArg，arg1, arg2, ...)` 返回一个新方法，即修改this指向后的方法。
 - 后面的参数会以默认参数的形式放到新数组中。
 
 

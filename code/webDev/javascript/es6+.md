@@ -193,7 +193,7 @@ function promiseAjax(url) {
 
   
 
-- `Promise.resolve` 方法: (value) => {}
+- `Promise.resolve` 方法
 
   返回一个**成功/失败**的 promise 对象,直接改变promise状态.返回的 promise 状态取决于value的类型：
 
@@ -206,15 +206,15 @@ function promiseAjax(url) {
 
   
 
-- `Promise.all 方法`: (promises) => {}
+- `Promise.all` 方法
 
   传递一个由promise组成的数组，返回一个新的 promise, 只有所有的 promise **都成功才成功**, 只要有一 个失败了就直接失败
 
-- `Promise.race` 方法: (promises) => {}
+- `Promise.race` 方法
 
   传递一个由promise组成的数组,返回一个新的 promise, **第一个完成**的 promise 的结果状态就是最终的结果状态
   
-- `Promise.any` 方法: (promises) => {}
+- `Promise.any` 方法
   
   传递一个由promise组成的数组,返回一个新的 promise, **第一个成功**的 promise 的结果状态就是最终的结果状态，如果所有 promise 都失败了，则返回一个失败原因的数组。
 

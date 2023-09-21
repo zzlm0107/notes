@@ -223,7 +223,7 @@ str.`replace`(regexp|substr, newSubStr|function)
 
 *obj.`hasOwnProperty`(prop)*
 
-**对象原型链关系判断** 测试一个对象是否存在于另一个对象的原型链上
+**对象原型链关系判断** 测试一个原型对象是否存在于另一个对象的原型链上
 
 *prototypeObj.`isPrototypeOf`(object)*
 

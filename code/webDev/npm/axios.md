@@ -165,7 +165,7 @@ axios.interceptors.response.use(function (response) {
 
 ### 取消请求
 
-axios支持通过创建一个 [`AbortController`](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) 取消请求：
+axios支持通过创建一个 [`AbortController`](https://developer.mozilla.org/zh-CN/docs/Web/API/AbortController) 取消请求：
 
 ```js
 const controller = new AbortController();
