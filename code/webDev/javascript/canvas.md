@@ -1,3 +1,13 @@
+---
+title: Canvas
+icon: flower
+date: 2023-09-22
+category:
+  - JS
+tag:
+  - canvas
+---
+
 ## 初识canvas
 
 `<canvas>`元素用于生成图像。它本身就像一个画布，JavaScript 通过操作它的 API，在上面生成图像。它的底层是一个个像素，基本上`<canvas>`是一个可以用 JavaScript 操作的位图（bitmap）。

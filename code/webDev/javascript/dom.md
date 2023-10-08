@@ -42,7 +42,7 @@ Document Object Model 文档对象模型，通过DOM可以来任意来修改网�
 - `el.firstChild/lastChild` 获取当前元素的第一个/最后一个子节点。包括空白文本节点。（不常用）
 - `el.firstElementChild/lastElementChild` 获取当前元素的第一个/最后一个子元素。仅元素标签。
 - `el.previousSibling/nextSibling` 获取当前元素的前一个/后一个兄弟节点。包括空白文本节点。（不常用）
-- `el.previousSibling/nextSibling` 获取当前元素的前一个/后一个兄弟元素。仅元素标签。
+- `el.previousElementSibling/nextElementSibling` 获取当前元素的前一个/后一个兄弟元素。仅元素标签。
 
 
 

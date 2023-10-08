@@ -1,7 +1,11 @@
 ---
 title: NUXT3
-icon: react
+icon: view
 date: 2023-09-16
+category:
+  - SSR
+tag:
+  - ssr
 ---
 
 
