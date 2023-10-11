@@ -153,6 +153,8 @@ function throttled(fn, delay) {
 
 - `JSON.parse( JSON.stringify(obj) )` 但会忽略undefined、symbol和函数
 
+- webAPI方法 `structuredClone(value)`  会克隆可序列化对象，但如Function，dom节点，原型链等无法复制
+
 - 手写递归循环深拷贝(简单版)
 
   ```js
