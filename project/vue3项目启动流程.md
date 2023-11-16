@@ -51,7 +51,7 @@ ESLint 安装成功后，执行 `npx eslint --init`，在安装完一个配置�
    "parser": "vue-eslint-parser",
    "parserOptions": {
        "ecmaVersion": "latest",
-       "parser": '@typescript-eslint/parser',
+       "parser": "@typescript-eslint/parser",
        "sourceType": "module"
    },
    ```
