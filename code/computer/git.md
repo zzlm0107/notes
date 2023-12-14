@@ -140,7 +140,31 @@ git pull 地址 分支                  拉取远程仓库，拉取前建议先�
 git clone 地址                     克隆全程仓库到本地
 ```
 
-多人合作时务必先拉去远程仓库的最新代码后再推送。
+多人合作时务必先拉取远程仓库的最新代码后再推送。
+
+
+
+1. 当远程仓库被别人更新了时，自己的本地也做了一些修改，且**被人修改的文件和自己本地修改的文件不冲突即不一致**，此时
+
+- 本地还没有commit，先pull远程仓库，会将远程仓库的代码拉取到本地，并向本地的commit记录里追加一次`pull origin: Fast-forward`, 本地已修改的代码不受影响，可以继续add ，commit，push。且追加的这次记录只存在本地，即使push后也不会出现在远程的提交记录里。
+
+- 本地已经commit，然后再pull远程仓库，会向本地的commit记录里追加一次`pull origin: Merge made by the 'ort' strategy.`，本地已修改的代码不受影响，可以继续push。但本地先commit的那次记录只会出现在本地，即使push后也不会出现在远程的提交记录里，远程也不会显示追加的记录，而是显示`Merge branch 'master' of https://gitee.com/zzlm0107/test`。  
+
+  *如果本地commit了多次，pull远程仓库也会向本地的commit记录里追加一次 'ort' strategy；push后本地commit多次的记录会出现在远程的提交记录里，远程不显示追加的记录，而是显示Merge xxx*
+
+2. 当远程仓库的某些文件被别人更新了，而自己的本地相同文件也做了修改，此时
+
+- 本地还没有commit，先pull远程仓库，会提示`Please commit your changes or stash them before you merge.`,即希望先commit或暂存，本地文件没有任何变化。
+
+- 本地已经commit，然后再pull远程仓库，会提示如下，即相关文件冲突了，需要手动修复。我们手动修复后即可继续add ，commit，push。提交到远程后也会携带本地的这两次commit记录。
+
+  ```bash
+  Auto-merging c.txt
+  CONFLICT (content): Merge conflict in c.txt
+  Automatic merge failed; fix conflicts and then commit the result.
+  ```
+
+  
 
 
 
