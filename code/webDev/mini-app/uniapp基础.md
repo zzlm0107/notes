@@ -119,22 +119,32 @@ globalStyle 用于设置应用的状态栏、导航条、标题、窗口背景�
 如果应用是一个多 tab 应用，可以通过 tabBar 配置项指定一级导航栏，以及 tab 切换时显示的对应页。
 
 ```json
-{
-  "tabBar": {	
-    "color": "#ccc",  // tab 上的文字默认颜色	
-    "selectedColor": "#ff55ff", // tab 上的文字选中时的颜色
-    "backgroundColor": "#ffffff" // tab背景色
-    "list": [
-    	{
-    		"text":"首页", //名称
-				"pagePath":"pages/index/index", //页面路径
-				"iconPath":"static/logo.png", //图片路径
-				"selectedIconPath":"static/1.jpg" //选择后图片路径
-    		// "iconfont": {} //字体图标配置，优先级比iconPath更高
-  		}
-    ]
-  }
-}
+"tabBar": {
+		"color": "#ccc",  // tab 上的文字默认颜色	
+		"selectedColor": "#ff55ff", // tab 上的文字选中时的颜色
+		"backgroundColor": "#ffffff", // tab背景色
+		"list": [
+			{
+				"text":"首页", //名称
+				"pagePath":"pages/index/index" //页面路径
+				// "iconPath":"static/logo.png", //图片路径
+				// "selectedIconPath":"static/1.jpg" //选择后图片路径
+				// "iconfont": {} //字体图标配置，优先级比iconPath更高
+			},
+			{
+				"text":"商城",
+				"pagePath":"pages/shop/shop"
+			},
+			{
+				"text":"客服",
+				"pagePath":"pages/chat/chat"
+			},
+			{
+				"text":"我的",
+				"pagePath":"pages/mine/mine"
+			}
+		]
+	}
 ```
 
 更多配置项请查看官方文档里的 [相关部分](https://uniapp.dcloud.net.cn/collocation/pages.html#pages)

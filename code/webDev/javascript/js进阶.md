@@ -153,6 +153,8 @@ function throttled(fn, delay) {
 
 - `JSON.parse( JSON.stringify(obj) )` 但会忽略undefined、symbol和函数
 
+- webAPI方法 `structuredClone(value)`  会克隆可序列化对象，但如Function，dom节点，原型链等无法复制
+
 - 手写递归循环深拷贝(简单版)
 
   ```js
@@ -186,11 +188,11 @@ function throttled(fn, delay) {
 
 1.创建一个新的空对象
 
-2.将新的对象作为函数的上下文对象，即将构造函数的this指向这个空对象。
+2.将这个空对象的 原型`__proto__` 指向构造函数的 原型对象`prototype`
 
-3.执行构造函数中的代码
+3.将构造函数的this指向这个空对象,然后执行构造函数中的代码，向空对象中添加属性和方法
 
-4.如果该函数没有返回对象，返回this，此时this指代的就是新对象
+4.如果该函数没有返回对象，则默认返回this，此时this指代的就是新对象
 
 ```js
 var obj = new Person()
@@ -301,7 +303,7 @@ g:全局搜索（global 将默认只匹配1次变为全局搜索匹配）
 |  \w     | [0-9a-zA-Z_] | 单词字符。表示数字、大小写字母或下划线，即word的简写 |
 |  \W     | [^0-9a-zA-Z_] | 非单词字符 |
 |  \s     | [ \t\v\n\r\f] | 空白符，包括空格、水平制表符、垂直制表符、换行符、回车符、换页符。即space的缩写 |
-|  \S     | [^ \t\v\n\r\f]] | 非空白符 |
+|  \S     | [^ \t\v\n\r\f] | 非空白符 |
 
 3. **量词：** 用来指定匹配字符需要连续出现的次数。
 

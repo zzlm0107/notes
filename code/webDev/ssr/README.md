@@ -1,6 +1,6 @@
 ---
 title: ssr 介绍
-icon: react
+icon: page
 date: 2023-09-12
 ---
 

@@ -164,7 +164,8 @@ this.$route.params.title
 ```js
  //$router的两个API
  this.$router.push({
-  name:'xiangqing',
+  // name:'xiangqing',
+  path: '/detail',
   query:{
     id:xxx,
     title:xxx
@@ -183,6 +184,7 @@ this.$route.params.title
  this.$router.go() //可前进也可后退
 ```
 
+> 特别注意：编程式路由导航跳转时，path不能与params一起使用，否则会忽略params选项；我们可以通过模板字符串拼接出完整path或通过name搭配params使用！
 
 
 ## 缓存路由组件
